@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put, Delete, UseGuards, ParseUUIDPipe, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Delete, UseGuards, ParseUUIDPipe, Query, BadRequestException } from '@nestjs/common';
 import { BookService } from './book.service';
 import { CreateBookDto } from './dto/create-book.dto';
 import { AuthGuard } from 'src/common/guard/auth.guard';
@@ -21,7 +21,15 @@ export class BookController {
     summary: 'Create new book'
   })
   create(@Body() dto: CreateBookDto) {
-    return this.bookService.create(dto);
+    const {published_year} = dto;
+    if (published_year) {
+      if (1500 < published_year && published_year < new Date().getFullYear()) {
+        return this.bookService.create(dto);
+      }else {
+      throw new BadRequestException('Published_year between 1500 and present time')
+      }
+    }
+
   }
 
   @Get('All')
@@ -58,15 +66,20 @@ export class BookController {
 
     if (title) where.title = title;
     if (author) where.author = author;
-    if (published_year) where.published_year = published_year;
     if (available) where.available = available;
+    if (published_year) {
+      if (1500 < published_year && published_year < new Date().getFullYear()) {
+        where.published_year = published_year;
+      } else {
+        throw new BadRequestException('Published_year between 1500 and present time')
+      }
+    }
 
     return this.bookService.query({
       where,
       relations: { histories: true, borrows: true }
     })
   }
-
 
   @Get(':id')
   findOne(@Param('id', ParseUUIDPipe) id: string) {
@@ -78,7 +91,15 @@ export class BookController {
   @Put(':id')
   @ApiBearerAuth()
   update(@Param('id', ParseUUIDPipe) id: string, @Body() dto: UpdateBookDto) {
-    return this.bookService.update(id, dto);
+    const { published_year } = dto;
+    if (published_year) {
+      if (1500 < published_year && published_year < new Date().getFullYear()) {
+        return this.bookService.update(id, dto);
+      } else {
+        throw new BadRequestException('Published_year between 1500 and present time')
+      }
+    }
+
   }
 
   @UseGuards(AuthGuard, RolesGuard)
