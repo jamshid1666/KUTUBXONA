@@ -1,6 +1,6 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Body, Patch, Param, Delete } from '@nestjs/common';
 import { BookHistoryService } from './book-history.service';
-import { CreateBookHistoryDto } from './dto/create-book-history.dto';
+// import { CreateBookHistoryDto } from './dto/create-book-history.dto';
 import { UpdateBookHistoryDto } from './dto/update-book-history.dto';
 import { AccessRoles } from 'src/common/decorator/role.decorator';
 import { Roles } from 'src/common/enum';
@@ -9,13 +9,6 @@ import { ApiBearerAuth } from '@nestjs/swagger';
 @Controller('book-history')
 export class BookHistoryController {
   constructor(private readonly bookHistoryService: BookHistoryService) { }
-
-  @AccessRoles(Roles.ADMIN, Roles.LIBRARIAN)
-  @Post('create book-history')
-  @ApiBearerAuth()
-  create(@Body() createBookHistoryDto: CreateBookHistoryDto) {
-    return this.bookHistoryService.create(createBookHistoryDto);
-  }
 
   @AccessRoles(Roles.ADMIN, Roles.LIBRARIAN)
   @Get('All')
